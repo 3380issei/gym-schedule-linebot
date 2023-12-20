@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"gym-schedule-linebot/db"
+)
 
 func main() {
-	fmt.Println("Hello World!")
+	db := db.NewDB()
+	fmt.Println(db)
 }
