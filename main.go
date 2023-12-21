@@ -11,8 +11,10 @@ import (
 func main() {
 	db := db.NewDB()
 	userRepository := repository.NewUserRepository(db)
+	gymRepository := repository.NewGymRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepository)
-	linebotController := controller.NewLinebotController(userUsecase)
+	gymUsecase := usecase.NewGymUsecase(gymRepository)
+	linebotController := controller.NewLinebotController(userUsecase, gymUsecase)
 
 	router := router.NewRouter(linebotController)
 
