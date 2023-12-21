@@ -3,6 +3,8 @@ package usecase
 import (
 	"gym-schedule-linebot/model"
 	"gym-schedule-linebot/repository"
+
+	"github.com/google/uuid"
 )
 
 type GymUsecase interface {
@@ -18,6 +20,8 @@ func NewGymUsecase(gr repository.GymRepository) *gymUsecase {
 }
 
 func (gu *gymUsecase) CreateGym(gym *model.Gym) error {
+	gym.ID = uuid.New().String()
+
 	if err := gu.gr.CreateGym(gym); err != nil {
 		return err
 	}
