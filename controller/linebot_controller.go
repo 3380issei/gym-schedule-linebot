@@ -5,6 +5,7 @@ import (
 	"gym-schedule-linebot/model"
 	"gym-schedule-linebot/usecase"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -46,22 +47,38 @@ func (lc *linebotController) CatchEvents(c *gin.Context) {
 	for _, event := range cb.Events {
 		switch e := event.(type) {
 		case webhook.FollowEvent: // when user add bot as friend
-			lc.createUser(e, c)
+			lc.handleFollowEvent(e, c)
 		}
 	}
 }
 
-func (lc *linebotController) createUser(fe webhook.FollowEvent, c *gin.Context) {
+func (lc *linebotController) handleFollowEvent(fe webhook.FollowEvent, c *gin.Context) {
 	switch s := fe.Source.(type) {
 	case webhook.UserSource:
-		user := model.User{
-			ID: s.UserId,
+		userID := s.UserId
+		profile, err := lc.fetchUserProfileByID(userID)
+		if err != nil {
+			fmt.Printf("failed to get user profile: %v", err)
 		}
 
-		if err := lc.uu.CreateUser(&user); err != nil {
-			fmt.Println(err)
+		user := &model.User{
+			ID:       userID,
+			UserName: profile.DisplayName,
 		}
 
-		c.JSON(200, gin.H{"messsage": "success"})
+		if err := lc.uu.CreateUser(user); err != nil {
+			fmt.Printf("failed to create user: %v", err)
+		}
+
+		c.JSON(http.StatusCreated, user)
 	}
+}
+
+func (lc *linebotController) fetchUserProfileByID(userID string) (*linebot.UserProfileResponse, error) {
+	res, err := lc.bot.GetProfile(userID).Do()
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
