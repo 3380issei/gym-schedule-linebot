@@ -10,4 +10,7 @@ type Gym struct {
 	Address   string          `json:"address"`
 	Latitude  decimal.Decimal `json:"latitude" gorm:"not null"`
 	Longitude decimal.Decimal `json:"longitude" gorm:"not null"`
+
+	UserID string `json:"user_id" gorm:"not null"`
+	User   User   `gorm:"foreignkey:UserID"`
 }
