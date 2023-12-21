@@ -20,9 +20,10 @@ type LinebotController interface {
 type linebotController struct {
 	bot *linebot.Client
 	uu  usecase.UserUsecase
+	gu  usecase.GymUsecase
 }
 
-func NewLinebotController(uu usecase.UserUsecase) *linebotController {
+func NewLinebotController(uu usecase.UserUsecase, gu usecase.GymUsecase) *linebotController {
 	secret := os.Getenv("LINE_CHANNEL_SECRET")
 	token := os.Getenv("LINE_CHANNEL_TOKEN")
 
@@ -34,6 +35,7 @@ func NewLinebotController(uu usecase.UserUsecase) *linebotController {
 	return &linebotController{
 		bot: bot,
 		uu:  uu,
+		gu:  gu,
 	}
 }
 
@@ -103,7 +105,7 @@ func (lc *linebotController) handleMessageEvent(me webhook.MessageEvent, c *gin.
 			UserID:    userID,
 		}
 
-		if err := lc.uu.CreateGym(gym); err != nil {
+		if err := lc.gu.CreateGym(gym); err != nil {
 			fmt.Printf("failed to create gym: %v", err)
 		}
 
