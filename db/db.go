@@ -18,7 +18,7 @@ func NewDB() *gorm.DB {
 
 	fmt.Println("Connceted")
 
-	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.User{}, &model.Gym{})
 
 	return db
 }
